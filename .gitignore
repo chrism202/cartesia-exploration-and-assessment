@@ -46,3 +46,8 @@ env/
 # Audio files (optional - uncomment if you want to ignore generated audio)
 # *.wav
 # *.mp3
+
+internal-notes.md
+takehome-project-prompt.md
+report.md
+drafts/
