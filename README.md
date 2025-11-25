@@ -1,9 +1,25 @@
-# Cartesia Text-to-Speech Streamlit Application
+# Cartesia AI Exploration & Assessment
 
-A clean, minimal web application for converting text to speech using [Cartesia AI's](https://cartesia.ai) TTS API. Built with Streamlit for simplicity and ease of deployment.
+A collection of Streamlit applications for exploring conversational AI and text-to-speech capabilities using Cartesia AI, OpenAI, and Anthropic APIs.
 
-## Features
+## Applications
 
+### 1. 🎤 AI Voice Conversation (`conversation_app.py`)
+A bi-directional streaming conversation app that enables natural voice conversations with AI.
+
+**Features:**
+- 🎙️ **Voice input** using browser's audio recorder
+- 🎧 **Speech-to-text** using OpenAI Whisper
+- 🤖 **Conversational AI** powered by Anthropic Claude
+- 🔊 **Voice responses** using Cartesia TTS
+- 💬 **Multi-turn conversations** with history tracking
+- ⚡ **Real-time processing** without button clicks
+- 📊 **Performance metrics** showing response times for each step
+
+### 2. 🔊 Text-to-Speech Demo (`app.py`)
+A simple TTS demo for converting text to natural-sounding speech.
+
+**Features:**
 - 🎙️ **Natural-sounding speech** using Cartesia's Sonic 3 model
 - 🎨 **Multiple voices** to choose from (professional, casual, narrative styles)
 - ⚙️ **Configurable settings** (model, sample rate, voice selection)
@@ -15,7 +31,9 @@ A clean, minimal web application for converting text to speech using [Cartesia A
 ## Prerequisites
 
 - Python 3.8 or higher
-- Cartesia AI API key ([sign up here](https://cartesia.ai))
+- **Cartesia AI API key** ([sign up here](https://cartesia.ai)) - for text-to-speech
+- **OpenAI API key** ([sign up here](https://platform.openai.com)) - for speech-to-text (conversation app only)
+- **Anthropic API key** ([sign up here](https://console.anthropic.com)) - for AI conversation (conversation app only)
 
 ## Local Setup (Mac)
 
@@ -39,7 +57,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Configure API key
+### 4. Configure API keys
 
 Create a `.env` file in the project root:
 
@@ -47,14 +65,28 @@ Create a `.env` file in the project root:
 cp .env.example .env
 ```
 
-Edit `.env` and add your Cartesia API key:
+Edit `.env` and add your API keys:
 
+**For the TTS demo (`app.py`):**
 ```
 CARTESIA_API_KEY=your_actual_api_key_here
 ```
 
-### 5. Run the application
+**For the conversation app (`conversation_app.py`), add all three:**
+```
+CARTESIA_API_KEY=your_cartesia_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here
+ANTHROPIC_API_KEY=your_anthropic_api_key_here
+```
 
+### 5. Run the applications
+
+**For the AI Voice Conversation app:**
+```bash
+streamlit run conversation_app.py
+```
+
+**For the simple TTS demo:**
 ```bash
 streamlit run app.py
 ```
@@ -203,6 +235,28 @@ Now access via `http://your-ec2-public-ip`
 
 ## Usage
 
+### AI Voice Conversation App (`conversation_app.py`)
+
+1. **Click the microphone icon** in the audio recorder to start recording
+2. **Speak your message** clearly into your microphone
+3. **Click stop** when you're done speaking
+4. The system will **automatically**:
+   - Transcribe your speech using OpenAI Whisper
+   - Generate an AI response using Claude
+   - Convert the response to speech using Cartesia
+   - Play the audio response
+5. **View the conversation history** in the right panel
+6. **Record another message** to continue the conversation
+7. **Monitor performance metrics** to assess response speed
+
+**Tips:**
+- Speak clearly and avoid background noise for best transcription
+- Keep messages conversational for natural responses
+- Use the reset button to start a new conversation
+- Adjust the system prompt in the sidebar to change AI behavior
+
+### Text-to-Speech Demo (`app.py`)
+
 1. **Enter text** in the text area (up to 5000 characters)
 2. **Select a voice** from the sidebar dropdown
 3. **Choose a model** (Sonic 3 recommended)
@@ -227,10 +281,11 @@ The application includes several pre-configured voices:
 
 ```
 cartesia-exploration-and-assessment/
-├── app.py              # Main Streamlit application
+├── conversation_app.py # AI voice conversation app (STT + LLM + TTS)
+├── app.py              # Simple text-to-speech demo
 ├── requirements.txt    # Python dependencies
 ├── .env.example        # Example environment variables
-├── .env                # Your API key (git-ignored)
+├── .env                # Your API keys (git-ignored)
 ├── .gitignore          # Git ignore rules
 └── README.md           # This file
 ```
@@ -260,17 +315,29 @@ cartesia-exploration-and-assessment/
 
 ## Dependencies
 
-This project uses minimal dependencies:
+This project uses the following dependencies:
 - **streamlit** - Web application framework
-- **cartesia** - Official Cartesia AI Python SDK
+- **cartesia** - Official Cartesia AI Python SDK for text-to-speech
+- **openai** - OpenAI API client for Whisper speech-to-text
+- **anthropic** - Anthropic API client for Claude conversation
 - **python-dotenv** - Environment variable management
 
 ## API Documentation
 
-For more information about Cartesia's API:
+For more information about the APIs used:
+
+**Cartesia AI (Text-to-Speech):**
 - [Cartesia API Documentation](https://docs.cartesia.ai/)
 - [Python SDK on PyPI](https://pypi.org/project/cartesia/)
 - [GitHub Repository](https://github.com/cartesia-ai/cartesia-python)
+
+**OpenAI (Speech-to-Text):**
+- [Whisper API Documentation](https://platform.openai.com/docs/guides/speech-to-text)
+- [OpenAI API Reference](https://platform.openai.com/docs/api-reference)
+
+**Anthropic (Conversational AI):**
+- [Claude API Documentation](https://docs.anthropic.com/)
+- [Anthropic API Reference](https://docs.anthropic.com/claude/reference)
 
 ## License
 
