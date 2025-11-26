@@ -43,6 +43,68 @@ SAMPLE_RATES = {
     "8 kHz": 8000,
 }
 
+
+def _load_initial_api_key(key_name: str) -> str:
+    """Load an API key from Streamlit secrets or environment without crashing on missing keys."""
+    secret_val = None
+    try:
+        if key_name in st.secrets:
+            secret_val = st.secrets[key_name]
+    except Exception:
+        # st.secrets may not be available locally; ignore
+        secret_val = None
+    env_val = os.getenv(key_name)
+    return (secret_val or env_val or "").strip()
+
+
+def bootstrap_api_keys():
+    """Seed session state with any stored keys so we can use or override them at runtime."""
+    if "cartesia_api_key" not in st.session_state:
+        st.session_state["cartesia_api_key"] = _load_initial_api_key("CARTESIA_API_KEY")
+    if "elevenlabs_api_key" not in st.session_state:
+        st.session_state["elevenlabs_api_key"] = _load_initial_api_key("ELEVENLABS_API_KEY")
+
+
+def render_api_key_controls():
+    """Sidebar controls to view status and override API keys for this session."""
+    st.subheader("API Keys")
+    st.caption("Uses saved env/secrets by default. Provide your own keys to override for this session.")
+
+    cartesia_present = bool(st.session_state.get("cartesia_api_key"))
+    eleven_present = bool(st.session_state.get("elevenlabs_api_key"))
+
+    col1, col2 = st.columns(2)
+    with col1:
+        st.checkbox("Cartesia key loaded", value=cartesia_present, disabled=True)
+    with col2:
+        st.checkbox("ElevenLabs key loaded", value=eleven_present, disabled=True)
+
+    cartesia_input = st.text_input(
+        "Cartesia API Key",
+        value="",
+        type="password",
+        placeholder="Enter Cartesia API key",
+        key="cartesia_key_input",
+        help="Overrides any saved key for this session"
+    )
+    eleven_input = st.text_input(
+        "ElevenLabs API Key",
+        value="",
+        type="password",
+        placeholder="Enter ElevenLabs API key",
+        key="elevenlabs_key_input",
+        help="Overrides any saved key for this session"
+    )
+
+    if st.button("Use these keys for this session", use_container_width=True):
+        if cartesia_input.strip():
+            st.session_state["cartesia_api_key"] = cartesia_input.strip()
+        if eleven_input.strip():
+            st.session_state["elevenlabs_api_key"] = eleven_input.strip()
+        st.success("API keys updated for this session. Keys are not stored on disk.")
+        st.rerun()
+
+
 # ElevenLabs voice options (common voices)
 ELEVENLABS_VOICES = {
     "Rachel": "21m00Tcm4TlvDq8ikWAM",
@@ -90,7 +152,7 @@ ELEVENLABS_VOICES = {
 
 def initialize_cartesia_client():
     """Initialize Cartesia client with API key from environment."""
-    api_key = os.getenv("CARTESIA_API_KEY")
+    api_key = st.session_state.get("cartesia_api_key") or _load_initial_api_key("CARTESIA_API_KEY")
     if not api_key:
         return None
     return Cartesia(api_key=api_key)
@@ -98,7 +160,7 @@ def initialize_cartesia_client():
 
 def initialize_elevenlabs_client():
     """Initialize ElevenLabs client with API key from environment."""
-    api_key = os.getenv("ELEVENLABS_API_KEY")
+    api_key = st.session_state.get("elevenlabs_api_key") or _load_initial_api_key("ELEVENLABS_API_KEY")
     if not api_key:
         return None
     return ElevenLabs(api_key=api_key)
@@ -167,11 +229,11 @@ def generate_elevenlabs_speech(client, text, voice_id):
     try:
         start_time = time.time()
 
-        # Call the ElevenLabs TTS API
-        audio_generator = client.generate(
+        # Call the ElevenLabs Text-to-Speech API (current client API)
+        audio_stream = client.text_to_speech.convert(
+            voice_id=voice_id,
+            model_id="eleven_multilingual_v2",
             text=text,
-            voice=voice_id,
-            model="eleven_multilingual_v2",
             voice_settings=VoiceSettings(
                 stability=0.5,
                 similarity_boost=0.75,
@@ -180,16 +242,20 @@ def generate_elevenlabs_speech(client, text, voice_id):
             )
         )
 
-        # Collect all audio chunks
-        audio_data = b""
-        for chunk in audio_generator:
-            audio_data += chunk
+        # Collect all audio chunks (convert returns an iterator of bytes)
+        audio_data = b"".join(audio_stream)
 
         end_time = time.time()
         generation_time = end_time - start_time
 
         return audio_data, generation_time
 
+    except AttributeError:
+        st.error(
+            "ElevenLabs client is missing `text_to_speech.convert`. "
+            "Upgrade the `elevenlabs` package (e.g., `pip install -U elevenlabs>=1.0.0`)."
+        )
+        return None, None
     except Exception as e:
         st.error(f"Error generating ElevenLabs speech: {str(e)}")
         return None, None
@@ -468,7 +534,17 @@ def render_comparison_tab():
 
 
 def main():
+    bootstrap_api_keys()
     st.title("🔊 TTS Comparison Arena")
+    st.warning(
+        "This demo is currently configured with personal API tokens from the environment. "
+        "Please enter your own Cartesia and ElevenLabs API keys in the sidebar before continued use."
+    )
+
+    # Global sidebar controls for API keys
+    with st.sidebar:
+        render_api_key_controls()
+        st.divider()
 
     # Create tabs
     tab1, tab2 = st.tabs(["🎙️ Cartesia TTS", "🥊 Comparison Arena"])

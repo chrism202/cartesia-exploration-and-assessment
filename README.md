@@ -1,6 +1,6 @@
-# Cartesia Text-to-Speech Streamlit Application
+# Cartesia TTS + ElevenLabs Arena (Streamlit)
 
-A clean, minimal web application for converting text to speech using [Cartesia AI's](https://cartesia.ai) TTS API. Built with Streamlit for simplicity and ease of deployment.
+A clean Streamlit app to convert text to speech with [Cartesia AI](https://cartesia.ai) and a head-to-head comparison tab against ElevenLabs.
 
 ## Features
 
@@ -9,6 +9,7 @@ A clean, minimal web application for converting text to speech using [Cartesia A
 - ⚙️ **Configurable settings** (model, sample rate, voice selection)
 - 🎧 **Instant playback** in the browser
 - 📥 **Download audio** as WAV files
+- 🔑 **API key flexibility** — uses env/Streamlit secrets by default, lets you paste keys in the sidebar per session
 - 🚀 **Minimal dependencies** - no Docker or Kubernetes required
 - 💻 **Cross-platform** - runs on Mac, Linux, and Windows
 
@@ -16,6 +17,7 @@ A clean, minimal web application for converting text to speech using [Cartesia A
 
 - Python 3.8 or higher
 - Cartesia AI API key ([sign up here](https://cartesia.ai))
+- ElevenLabs API key (only needed for the comparison tab)
 
 ## Local Setup (Mac)
 
@@ -39,7 +41,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Configure API key
+### 4. Configure API keys
 
 Create a `.env` file in the project root:
 
@@ -47,10 +49,11 @@ Create a `.env` file in the project root:
 cp .env.example .env
 ```
 
-Edit `.env` and add your Cartesia API key:
+Edit `.env` and add your keys:
 
 ```
 CARTESIA_API_KEY=your_actual_api_key_here
+ELEVENLABS_API_KEY=your_elevenlabs_key_here
 ```
 
 ### 5. Run the application
@@ -60,6 +63,13 @@ streamlit run app.py
 ```
 
 The application will open in your default browser at `http://localhost:8501`
+
+## Features
+
+- 🎙️ **Cartesia TTS tab:** pick a Cartesia voice/model/sample rate, enter up to 5,000 characters, listen inline, and download WAV output.
+- 🥊 **Comparison Arena tab:** side-by-side generation for Cartesia (Model A) and ElevenLabs (Model B) with voice pickers, timing metrics, audio players, downloads, and a quick voting widget.
+- 🔑 **API key checks & overrides:** surfaces whether each provider’s key is loaded and lets you paste your own keys in the sidebar; ElevenLabs is optional unless you use the arena.
+- 🧾 **Light footprint:** Streamlit, Cartesia SDK, ElevenLabs SDK, python-dotenv.
 
 ## EC2 Deployment
 
@@ -203,25 +213,20 @@ Now access via `http://your-ec2-public-ip`
 
 ## Usage
 
-1. **Enter text** in the text area (up to 5000 characters)
-2. **Select a voice** from the sidebar dropdown
-3. **Choose a model** (Sonic 3 recommended)
-4. **Select sample rate** (44.1 kHz for best quality)
-5. **Click "Generate Speech"** to create audio
-6. **Listen** using the built-in audio player
-7. **Download** the audio file if needed
+### Cartesia tab
+1. Enter text (up to 5,000 characters).
+2. Select a Cartesia voice, model (Sonic 3 recommended), and sample rate (44.1 kHz default).
+3. Click “Generate Speech” to create audio, listen inline, or download a WAV.
 
-## Available Voices
+### Comparison Arena tab
+1. Ensure both `CARTESIA_API_KEY` and `ELEVENLABS_API_KEY` are set.
+2. Enter shared text.
+3. Pick voices for Cartesia and ElevenLabs.
+4. Click “Generate Both” to hear each, see generation times, download outputs, and cast a quick vote.
 
-The application includes several pre-configured voices:
-- Barbershop Man
-- Salesman
-- Newsman
-- British Lady
-- Professional Woman
-- Friendly Woman
-- Calm Woman
-- Storyteller Lady
+### API key handling
+- The app loads keys from `.env` or Streamlit secrets by default.
+- A warning banner reminds you to bring your own keys; use the sidebar API key section to paste Cartesia and/or ElevenLabs keys for the current session (keys are not stored on disk).
 
 ## Project Structure
 
