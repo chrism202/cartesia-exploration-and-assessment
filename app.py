@@ -193,8 +193,7 @@ def generate_cartesia_speech(client, text, voice_id, model_id, sample_rate):
                 "id": voice_id
             },
             output_format={
-                "container": "wav",
-                "encoding": "pcm_f32le",
+                "container": "mp3",
                 "sample_rate": sample_rate
             },
             language="en"
@@ -347,14 +346,14 @@ def render_cartesia_tab():
                     st.success(f"✅ Speech generated successfully in {gen_time:.2f} seconds!")
 
                     # Display audio player
-                    st.audio(audio_data, format="audio/wav")
+                    st.audio(audio_data, format="audio/mpeg")
 
                     # Download button
                     st.download_button(
                         label="📥 Download Audio",
                         data=audio_data,
-                        file_name="cartesia_tts_output.wav",
-                        mime="audio/wav"
+                        file_name="cartesia_tts_output.mp3",
+                        mime="audio/mpeg"
                     )
 
 
@@ -362,6 +361,15 @@ def render_comparison_tab():
     """Render the comparison tab for Cartesia vs ElevenLabs."""
     st.markdown("### 🥊 TTS Arena: Cartesia vs ElevenLabs")
     st.markdown("Compare voice outputs from Cartesia and ElevenLabs side-by-side")
+
+    # Ensure session storage for generated samples
+    if "comp_results" not in st.session_state:
+        st.session_state["comp_results"] = {
+            "cartesia_audio": None,
+            "cartesia_time": None,
+            "eleven_audio": None,
+            "eleven_time": None,
+        }
 
     # Initialize clients
     cartesia_client = initialize_cartesia_client()
@@ -442,69 +450,86 @@ def render_comparison_tab():
         if not comparison_text.strip():
             st.warning("Please enter some text to compare.")
         else:
-            # Create two columns for side-by-side comparison
-            col_a, col_b = st.columns(2)
-
             # Generate Cartesia audio
-            with col_a:
-                st.markdown("#### 🔵 Model A")
-                with st.spinner("Generating..."):
-                    cartesia_audio, cartesia_time = generate_cartesia_speech(
-                        client=cartesia_client,
-                        text=comparison_text,
-                        voice_id=cartesia_voice_id,
-                        model_id=cartesia_model_id,
-                        sample_rate=44100
-                    )
+            with st.spinner("Generating Cartesia..."):
+                cartesia_audio, cartesia_time = generate_cartesia_speech(
+                    client=cartesia_client,
+                    text=comparison_text,
+                    voice_id=cartesia_voice_id,
+                    model_id=cartesia_model_id,
+                    sample_rate=44100
+                )
 
-                if cartesia_audio:
-                    st.metric("Generation Time", f"{cartesia_time:.3f}s")
-                    st.audio(cartesia_audio, format="audio/wav")
-                    st.download_button(
-                        label="📥 Download A",
-                        data=cartesia_audio,
-                        file_name="model_a_output.wav",
-                        mime="audio/wav",
-                        key="download_a"
-                    )
+            if cartesia_audio:
+                st.session_state["comp_results"]["cartesia_audio"] = cartesia_audio
+                st.session_state["comp_results"]["cartesia_time"] = cartesia_time
 
             # Generate ElevenLabs audio
-            with col_b:
-                st.markdown("#### 🟢 Model B")
-                with st.spinner("Generating..."):
-                    elevenlabs_audio, elevenlabs_time = generate_elevenlabs_speech(
-                        client=elevenlabs_client,
-                        text=comparison_text,
-                        voice_id=elevenlabs_voice_id
-                    )
+            with st.spinner("Generating ElevenLabs..."):
+                elevenlabs_audio, elevenlabs_time = generate_elevenlabs_speech(
+                    client=elevenlabs_client,
+                    text=comparison_text,
+                    voice_id=elevenlabs_voice_id
+                )
 
-                if elevenlabs_audio:
-                    st.metric("Generation Time", f"{elevenlabs_time:.3f}s")
-                    st.audio(elevenlabs_audio, format="audio/mpeg")
-                    st.download_button(
-                        label="📥 Download B",
-                        data=elevenlabs_audio,
-                        file_name="model_b_output.mp3",
-                        mime="audio/mpeg",
-                        key="download_b"
-                    )
+            if elevenlabs_audio:
+                st.session_state["comp_results"]["eleven_audio"] = elevenlabs_audio
+                st.session_state["comp_results"]["eleven_time"] = elevenlabs_time
+
+    # Always render available audio from session (persists after reruns/downloads)
+    if st.session_state["comp_results"]["cartesia_audio"] or st.session_state["comp_results"]["eleven_audio"]:
+        col_a, col_b = st.columns(2)
+
+        with col_a:
+            st.markdown("#### 🔵 Cartesia")
+            if st.session_state["comp_results"]["cartesia_audio"]:
+                st.metric(
+                    "Generation Time (Cartesia)",
+                    f"{st.session_state['comp_results']['cartesia_time']:.3f}s",
+                    help="Measured wall-clock seconds from request start until all audio bytes are received."
+                )
+                st.audio(st.session_state["comp_results"]["cartesia_audio"], format="audio/mpeg")
+                st.download_button(
+                    label="📥 Download Cartesia",
+                    data=st.session_state["comp_results"]["cartesia_audio"],
+                    file_name="cartesia_output.mp3",
+                    mime="audio/mpeg",
+                    key="download_a"
+                )
+
+        with col_b:
+            st.markdown("#### 🟢 ElevenLabs")
+            if st.session_state["comp_results"]["eleven_audio"]:
+                st.metric(
+                    "Generation Time (ElevenLabs)",
+                    f"{st.session_state['comp_results']['eleven_time']:.3f}s",
+                    help="Measured wall-clock seconds from request start until all audio bytes are received."
+                )
+                st.audio(st.session_state["comp_results"]["eleven_audio"], format="audio/mpeg")
+                st.download_button(
+                    label="📥 Download ElevenLabs",
+                    data=st.session_state["comp_results"]["eleven_audio"],
+                    file_name="elevenlabs_output.mp3",
+                    mime="audio/mpeg",
+                    key="download_b"
+                )
 
             # Voting section
-            if cartesia_audio and elevenlabs_audio:
+            if st.session_state["comp_results"]["cartesia_audio"] and st.session_state["comp_results"]["eleven_audio"]:
                 st.divider()
                 st.markdown("### 🗳️ Which one sounds better?")
 
                 col1, col2, col3, col4 = st.columns([1, 1, 1, 1])
 
                 with col1:
-                    if st.button("👍 Model A", use_container_width=True, key="vote_a"):
-                        st.session_state['last_vote'] = 'Model A (Cartesia)'
-                        st.success(f"You preferred Model A (Cartesia)!")
+                    if st.button("👍 Cartesia", use_container_width=True, key="vote_a"):
+                        st.session_state['last_vote'] = 'Cartesia'
+                        st.success("You preferred Cartesia!")
 
                 with col2:
-                    if st.button("👍 Model B", use_container_width=True, key="vote_b"):
-                        st.session_state['last_vote'] = 'Model B (ElevenLabs)'
-                        st.success(f"You preferred Model B (ElevenLabs)!")
+                    if st.button("👍 ElevenLabs", use_container_width=True, key="vote_b"):
+                        st.session_state['last_vote'] = 'ElevenLabs'
+                        st.success("You preferred ElevenLabs!")
 
                 with col3:
                     if st.button("🤝 Tie", use_container_width=True, key="vote_tie"):
@@ -519,18 +544,6 @@ def render_comparison_tab():
                 # Display last vote
                 if 'last_vote' in st.session_state:
                     st.caption(f"Last vote: {st.session_state['last_vote']}")
-
-                # Show model reveal
-                with st.expander("🔍 Reveal Models"):
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        st.markdown("**Model A:** Cartesia")
-                        st.caption(f"Voice: {cartesia_voice_name}")
-                        st.caption(f"Model: {cartesia_model_name}")
-                    with col2:
-                        st.markdown("**Model B:** ElevenLabs")
-                        st.caption(f"Voice: {elevenlabs_voice_name}")
-                        st.caption("Model: Eleven Multilingual v2")
 
 
 def main():

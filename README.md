@@ -8,7 +8,7 @@ A clean Streamlit app to convert text to speech with [Cartesia AI](https://carte
 - 🎨 **Multiple voices** to choose from (professional, casual, narrative styles)
 - ⚙️ **Configurable settings** (model, sample rate, voice selection)
 - 🎧 **Instant playback** in the browser
-- 📥 **Download audio** as WAV files
+- 📥 **Download audio** as MP3 files
 - 🔑 **API key flexibility** — uses env/Streamlit secrets by default, lets you paste keys in the sidebar per session
 - 🚀 **Minimal dependencies** - no Docker or Kubernetes required
 - 💻 **Cross-platform** - runs on Mac, Linux, and Windows
@@ -66,7 +66,7 @@ The application will open in your default browser at `http://localhost:8501`
 
 ## Features
 
-- 🎙️ **Cartesia TTS tab:** pick a Cartesia voice/model/sample rate, enter up to 5,000 characters, listen inline, and download WAV output.
+- 🎙️ **Cartesia TTS tab:** pick a Cartesia voice/model/sample rate, enter up to 5,000 characters, listen inline, and download MP3 output.
 - 🥊 **Comparison Arena tab:** side-by-side generation for Cartesia (Model A) and ElevenLabs (Model B) with voice pickers, timing metrics, audio players, downloads, and a quick voting widget.
 - 🔑 **API key checks & overrides:** surfaces whether each provider’s key is loaded and lets you paste your own keys in the sidebar; ElevenLabs is optional unless you use the arena.
 - 🧾 **Light footprint:** Streamlit, Cartesia SDK, ElevenLabs SDK, python-dotenv.
@@ -216,7 +216,7 @@ Now access via `http://your-ec2-public-ip`
 ### Cartesia tab
 1. Enter text (up to 5,000 characters).
 2. Select a Cartesia voice, model (Sonic 3 recommended), and sample rate (44.1 kHz default).
-3. Click “Generate Speech” to create audio, listen inline, or download a WAV.
+3. Click “Generate Speech” to create audio, listen inline, or download an MP3.
 
 ### Comparison Arena tab
 1. Ensure both `CARTESIA_API_KEY` and `ELEVENLABS_API_KEY` are set.
