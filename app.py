@@ -275,8 +275,8 @@ def render_cartesia_tab():
 
     # Sidebar for configuration
     with st.sidebar:
-        st.header("⚙️ Cartesia Settings")
-
+        st.header("🎙️ Cartesia TTS Settings")
+# ⚙️
         # Voice selection
         selected_voice_name = st.selectbox(
             "Voice",
@@ -308,7 +308,7 @@ def render_cartesia_tab():
     st.markdown("### Enter your text")
 
     # Text input with default example
-    default_text = "Hello! This is a demonstration of Cartesia's text to speech technology. It sounds remarkably natural and realistic."
+    default_text = "To be or not to be. That is the question."
 
     text_input = st.text_area(
         "Text to convert to speech",
@@ -393,9 +393,13 @@ def render_comparison_tab():
         st.info("Please set both CARTESIA_API_KEY and ELEVENLABS_API_KEY in your .env file to use the comparison feature.")
         return
 
+    
+
     # Settings in sidebar
     with st.sidebar:
-        st.header("⚙️ Comparison Settings")
+        st.divider()
+
+        st.header("🥊 Comparison Arena Settings")
 
         st.subheader("Cartesia")
         cartesia_voice_name = st.selectbox(
@@ -414,8 +418,6 @@ def render_comparison_tab():
         )
         cartesia_model_id = CARTESIA_MODELS[cartesia_model_name]
 
-        st.divider()
-
         st.subheader("ElevenLabs")
         elevenlabs_voice_name = st.selectbox(
             "ElevenLabs Voice",
@@ -430,7 +432,8 @@ def render_comparison_tab():
 
     comparison_text = st.text_area(
         "Text for comparison",
-        value="The quick brown fox jumps over the lazy dog. This is a test of text to speech quality.",
+        # value="The quick brown fox jumps over the lazy dog. This is a test of text to speech quality.",
+        value="The budget increased from $1,234 to $12,340.50 between 2015 and 2025.",
         height=120,
         max_chars=5000,
         help="Enter the text you want both services to speak (max 5000 characters)",
