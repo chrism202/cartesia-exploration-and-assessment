@@ -8,6 +8,7 @@ A Streamlit app built for a Cartesia take-home assignment: showcase Cartesia's S
 - **Convert text to speech with Cartesia.** Pick voices, models, and sample rates, then listen or download the MP3.
 - **Run a head-to-head test.** Generate the same text with Cartesia and ElevenLabs, compare timing, and vote for your preferred output.
 - **Work with your own keys.** Load secrets from environment variables or paste session-only overrides.
+- **Stream the sample outputs.** Open `index.html` (locally or via GitHub Pages) to browse and play everything in `supporting_files/` with deeplinks.
 
 ## Interview & report context
 - **Prompt:** Deliver a lightweight, developer-friendly UI that exercises Cartesia's TTS APIs and benchmarks them against a familiar baseline (ElevenLabs).
@@ -56,6 +57,7 @@ A Streamlit app built for a Cartesia take-home assignment: showcase Cartesia's S
 - `app.py` — Streamlit interface and provider integrations.
 - `requirements.txt` — Minimal dependency list.
 - `supporting_files/` — Sample audio outputs captured during testing.
+- `index.html` — Static audio gallery to stream/deeplink the MP3s in `supporting_files/` without cloning.
 - `assets/app-home.jpg` — Current UI screenshot for quick reference.
 
 ## Troubleshooting in brief
@@ -64,4 +66,3 @@ A Streamlit app built for a Cartesia take-home assignment: showcase Cartesia's S
 - Arena tab disabled: you need both Cartesia and ElevenLabs keys to unlock the head-to-head view.
 
 ---
-
