@@ -47,7 +47,11 @@ env/
 # *.wav
 # *.mp3
 
+# Cartesia specific
 internal-notes.md
 takehome-project-prompt.md
 # report.md
 drafts/
+report.html
+report.pdf
+print.css
