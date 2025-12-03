@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Supporting Audio Files</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --accent: #0f766e;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --card: #f8fafc;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    header {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      margin: 0 0 8px;
+      font-size: 1.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    header p {
+      margin: 0;
+      color: #cbd5e1;
+    }
+
+    main {
+      max-width: 1024px;
+      margin: 24px auto 48px;
+      padding: 0 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .audio-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .audio-item {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .audio-title {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #0f172a;
+      word-break: break-word;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .meta button {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      padding: 0;
+      font-weight: 600;
+    }
+
+    .meta button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .error {
+      color: #b91c1c;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body { background: #0b1221; color: #e2e8f0; }
+      header { background: #0b1221; }
+      .card { background: #0f172a; border-color: #1f2937; }
+      .audio-item { background: #111827; border-color: #1f2937; }
+      .audio-title { color: #e2e8f0; }
+      --border: #1f2937;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Supporting Audio Files</h1>
+    <p>Stream any audio asset in this repository without downloading.</p>
+  </header>
+  <main>
+    <section class="card" aria-live="polite">
+      <p id="description">Loading audio list…</p>
+      <ul id="audioList" class="audio-list"></ul>
+      <p id="error" class="error" hidden></p>
+    </section>
+  </main>
+
+  <script>
+    const audioList = document.getElementById('audioList');
+    const description = document.getElementById('description');
+    const errorEl = document.getElementById('error');
+
+    const params = new URLSearchParams(window.location.search);
+    const deeplinkTarget = params.get('track');
+
+    const basePath = window.location.pathname.replace(/\/[^/]*$/, '');
+
+    async function fetchLocalManifest() {
+      const manifestUrl = `${basePath}/supporting_files/manifest.json`;
+      const response = await fetch(manifestUrl);
+      if (!response.ok) throw new Error('Manifest not found');
+      const { files } = await response.json();
+      return files.map((name) => ({ name, url: `${basePath}/supporting_files/${encodeURIComponent(name)}` }));
+    }
+
+    function getRepoInfoFromLocation() {
+      const hostParts = window.location.host.split('.');
+      const owner = hostParts[0];
+      const pathParts = window.location.pathname.split('/').filter(Boolean);
+      const repo = pathParts[0];
+      if (!owner || !repo) return null;
+      return { owner, repo };
+    }
+
+    async function fetchFromGitHubAPI() {
+      const info = getRepoInfoFromLocation();
+      if (!info) throw new Error('Could not determine repository location');
+      const apiUrl = `https://api.github.com/repos/${info.owner}/${info.repo}/contents/supporting_files`;
+      const response = await fetch(apiUrl);
+      if (!response.ok) throw new Error('GitHub API request failed');
+      const data = await response.json();
+      return data
+        .filter((item) => item.type === 'file' && item.name.toLowerCase().endsWith('.mp3'))
+        .map((item) => ({ name: item.name, url: item.download_url }));
+    }
+
+    function buildDeeplink(name) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('track', name);
+      return url.toString();
+    }
+
+    function renderAudio(files) {
+      audioList.innerHTML = '';
+      description.textContent = `Found ${files.length} audio file${files.length === 1 ? '' : 's'}.`;
+      files.forEach(({ name, url }) => {
+        const item = document.createElement('li');
+        item.className = 'audio-item';
+        const title = document.createElement('p');
+        title.className = 'audio-title';
+        title.textContent = name;
+        const meta = document.createElement('div');
+        meta.className = 'meta';
+        const shareButton = document.createElement('button');
+        shareButton.type = 'button';
+        shareButton.textContent = 'Copy deeplink';
+        shareButton.addEventListener('click', async () => {
+          const link = buildDeeplink(name);
+          await navigator.clipboard.writeText(link);
+          shareButton.textContent = 'Copied!';
+          setTimeout(() => (shareButton.textContent = 'Copy deeplink'), 1500);
+        });
+        meta.append(shareButton);
+
+        const audio = document.createElement('audio');
+        audio.setAttribute('controls', '');
+        audio.setAttribute('preload', 'none');
+        audio.src = url;
+
+        item.append(title, meta, audio);
+        audioList.appendChild(item);
+      });
+
+      if (deeplinkTarget) {
+        const match = Array.from(audioList.children).find((el) =>
+          el.querySelector('.audio-title').textContent === deeplinkTarget
+        );
+        if (match) {
+          const audioEl = match.querySelector('audio');
+          audioEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          audioEl.play().catch(() => {});
+        }
+      }
+    }
+
+    async function loadAudio() {
+      try {
+        const files = await fetchLocalManifest().catch(fetchFromGitHubAPI);
+        renderAudio(files);
+      } catch (err) {
+        console.error(err);
+        errorEl.hidden = false;
+        errorEl.textContent = 'Unable to load audio list. Ensure supporting_files/manifest.json exists or host this page from the repository.';
+        description.textContent = 'No audio files available.';
+      }
+    }
+
+    loadAudio();
+  </script>
+</body>
+</html>

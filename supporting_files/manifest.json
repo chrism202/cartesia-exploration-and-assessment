@@ -1,0 +1,24 @@
+{
+  "files": [
+    "cartesia_loanwords_cafe.mp3",
+    "cartesia_locale-specific_loanwords_charlotte_uk.mp3",
+    "date_cartesia_output.mp3",
+    "date_elevenlabs_output.mp3",
+    "elevenlabs_loanwords_cafe.mp3",
+    "elevenlabs_locale-specific_loanwords_lily_uk.mp3",
+    "filenames_cartesia_output.mp3",
+    "filenames_elevenlabs_output.mp3",
+    "flat_sounding_elevenlabs_output_example.mp3",
+    "highly_expressive_cartesia_output_example.mp3",
+    "locale_cartesia_output.mp3",
+    "locale_elevenlabs_output.mp3",
+    "locale_specific2_pronounciation_cartesia_output_charlotte.mp3",
+    "locale_specific2_pronounciation_elevenlabs_output_lily.mp3",
+    "locale_specific_pronounciation_cartesia_output_charlotte.mp3",
+    "locale_specific_pronounciation_elevenlabs_output_lily.mp3",
+    "phd_cartesia_output.mp3",
+    "phd_elevenlabs_output.mp3",
+    "to_be1_cartesia_tts_output.mp3",
+    "to_be2_cartesia_tts_output.mp3"
+  ]
+}
