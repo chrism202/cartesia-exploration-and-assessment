@@ -2,7 +2,7 @@
 
 A Streamlit app built for a Cartesia take-home assignment: showcase Cartesia's Sonic models, contrast them with ElevenLabs, and document findings for the hiring panel. This README doubles as the landing page for new visitors and the cover sheet for the accompanying report.
 
-![Streamlit home showing Cartesia + ElevenLabs tabs](assets/app-home.jpg)
+![Streamlit home showing Cartesia + ElevenLabs tabs](supporting_files/screenshot1.png)
 
 ## What you can do
 - **Convert text to speech with Cartesia.** Pick voices, models, and sample rates, then listen or download the MP3.

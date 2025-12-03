@@ -7,71 +7,57 @@ Chris Morrison's report for the Model Behavior Product Manager take-home.
 
 ### 1.1. Specify how you did this?
 
-#### 1.1.1. Initial Investigation (Ready)
+#### 1.1.1. Initial Investigation
+My first step was to sign up for an account and open the playground (play.cartesia.ai) to "learn by doing". After trying a few different voices and expression settings in the Playground GUI, I skimmed the documentation (https://docs.cartesia.ai/build-with-cartesia/sonic-3/). My primary goal when reading the documentation and playing with the Playground was to identify the different 'levers' that were available to change *how* the speech was generated. 
 
- - My first step was to sign up for an account and open the playground (play.cartesia.ai) to "learn by doing". 
- - After trying a few different voices and expression settings in the Playground GUI, I skimmed the documentation (https://docs.cartesia.ai/build-with-cartesia/sonic-3/)
- - My primary goal when reading the documentation and playing with the Playground was to identify the different 'levers' that were available to change *how* the speach was generated.
- - From the docs, two things stood out to me specifically: 1) The first was that although Sonic 3 responded / adapted to punctuation, it did not respond directly to other text 'formatting' like italics and capitalization (both of which are commonly used in formal and informal writing to denote a change in tone); and 2) I noted that some voices were "more expressive" than others.
- - I tried to use these more expressive voices in my testing to ensure I was getting the best and latest version of the model.
+ #### 1.1.2. Enabling more robust testing
+After playing around on the Playground and identifying some specific areas of improvement for the model (see Step 2.1 below for details), I wanted to be able to more easily compare the results of Cartesia with ElevenLabs side-by-side without having to worry about copying and pasting. I used Claude Code to spin up a Streamlit app that I could use to generate TTS from both APIs from the same input prompt, similar to the popular 'LM/Chatbot Arena' but for speech. I've used Streamlit in the past, and it's a great way to focus on getting a very simple and usable GUI layer on top of some core logic (perfect for this use case). I primarily used this locally, but I pushed it to the Streamlit community cloud if you want to give it a try (you may need to add your own API key) [TTS Arena on Streamlit Cloud](https://chrism202-cartesia-exploration-and-assessment-app-rhhscb.streamlit.app/).
 
- #### 1.1.2. Enabling more robust testing (Ready)
-
- - After playing around on the Playground and identifing some specific areas of improvement for the model (see Step 2.1 below for details), I wanted to be able to more easily compare the results of Cartesia with ElevenLabs side-by-side without having to worry about copying and pasting.
- - I asked Claude Code to spin up a lightweight Streamlit app that I could use to generate TTS from both APIs from the same input prompt, similar to the popular 'LM/Chatbot Arena' but for speech. 
- - I have used Streamlit for many personal and work projects in the past and I find it a great way to focus on getting a very simple and usable GUI layer on top of the core logic of a project that you are working on - perfect for this use case. 
- - I primarily used this locally, but I pushed it to the Streamlit community cloud if you want to give it a try (you may need to add your own API key) - https://chrism202-cartesia-exploration-and-assessment-app-claude-d3yoiy.streamlit.app/
- - Throughout this exercise I made a few updates to the app using GPT-5 through Codex (e.g. the ability to add an API key, the 'Generation Time' tracker).
+### 1.2. What were you listening for specifically?
+The first thing I was listening for was a simple 'does it work'. Specifically, does it sound like a normal person for 99.9% of the speech. This is quite a high bar because even one unnatural expression can ruin the whole experience. In this regard, I found Sonic 3 to be excellent right out of the box, without any additional prompting or tweaking to punctuation, it was able to generate an excellently 'expressed' TTS ([Example](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/highly_expressive_cartesia_output_example.mp3)). In comparison, key competitors like ElevenLabs generate a very 'flat' sounding audio output from the same prompt ([Example](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/flat_sounding_elevenlabs_output_example.mp3))
 
 
-### 1.2. What were you listening for specifically? (Ready)
- - From my experience on Alexa, I know that the way that humans and models generate speech is extremely nuanced and tiny tweaks on the modeling side can lead to significant changes in the customer experience.
- - The first thing I was listening for was a simple 'does it work' ... does it sound like a normal person for 99.9% of the speech.
- - This is quite a high bar because even one unnatural expression can ruin the whole experience.
- - In this regard I am happy to say that Cartesia was excellent right out of the box, without any additional prompting or tweaking to punctuation, it was able to generate an excellently 'expressed' TTS ([Example](supporting_files/highly_expressive_cartesia_output_example.mp3)). 
- - In comparison, key competitors like ElevenLabs generate a very 'flat' sounding audio ouput from the same prompt ([Example](supporting_files/flat_sounding_elevenlabs_output_example.mp3))
+From my experience working on Alexa+, I know that the way that humans (and models) generate speech is extremely nuanced and tiny tweaks on the modeling side can lead to significant changes in the customer experience.
  
  - Beyond basic functionality, the most important thing I wanted to test was how much the expressiveness could be influenced without losing any of the nuance of how real humans speak. 
  - To assess this, I refer to an excellent comedy sketch I saw a few years ago, where some incredible stage actors debate how specifically to do the famous "to be or not to be" speech from Hamlet - https://www.youtube.com/watch?v=RJXiep-yGBw.
  - This video shows how the emphasis of one word or part of a phrase can change the whole meaning of the same phrase. Specifically, it shows how small and nuanced those changes should be.
 
  - My initial goal when experimenting with the Cartesia TTS model was to emulate this sketch by assessing how nuanced the changes would be in the output, for a given input. 
- - I experimented with different punctuation and noted how small differences in the input resulted in nuanced changes to the models generated output ([Example 1](supporting_files/to_be1_cartesia_tts_output.mp3), [Example 2](supporting_files/to_be2_cartesia_tts_output.mp3))
+ - I experimented with different punctuation and noted how small differences in the input resulted in nuanced changes to the models generated output ([Example 1](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/to_be1_cartesia_tts_output.mp3), [Example 2](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/to_be2_cartesia_tts_output.mp3))
 
  - Overall I would say that my thoughts after this initial testing is that out of the box, the Cartesia model worked excellently, with additional prompt instructions not being required (only optional).
  - However I did note that I wasn't able to use some common ways to add emphasis like bolding, italics, and capitalization - adding this 'formatting' type input didn't result in a different output, as might be expected (since this is a common way to emphasize tone/expression in written text).
 
 ## Step 2 - Specify 2-3 Aspects in which the model can improve
 
-2. Specify 2-3 aspects in which you think the model can improve. For each aspect, come up with an example of a transcript, and have a recorded output of that transcript. Specify whether the area of improvement is consistent (happens in every case) or probabilistic (happens in some cases).
-
 ### 2.1. Areas of Improvement
 
  - After testing of different speech dimensions, I identified two areas to focus on analyzing for model improvement: Locale-specific pronunciation; and Acronyms, numbers & symbols.
  - I selected these two areas because they represent fundamental capabilities that will scale across all use cases of the model, and aren't edge case functionality - it is critical that the model gets these things right.
 
-#### Pronounciation (Locale-specific and code-switching) + Bonus comparison
- - Being able to pronounce words correctly within the locale / dialect context is critical for natual human-like TTS. 
+#### pronunciation (Locale-specific and code-switching) + Bonus comparison
+ - Being able to pronounce words correctly within the locale / dialect context is critical for natural human-like TTS. 
  - This is a nuanced area because some words are pronounced differently depending on the dialect.
  - For example in for example in US english, "croissant" (French loanword) is typically pronounced to rhyme with 'want', whereas in British English it would be pronounced more like the French version (although native French speakers would debate the similarity!).
- - Other loanwords are typically pronounced using the native pronounciation, even if the word itself would be pronounced differently if written in English.
- - A classic illustrative example of this is Mexican-Spanish placenames like Guadalajara and Tiajuana which are pronounced with a Spanish 'hwa' in place of the hard 'j/g', even by English speakers with no Spanish language skills.
+ - Other loanwords are typically pronounced using the native pronunciation, even if the word itself would be pronounced differently if written in English.
+ - A classic illustrative example of this is Mexican-Spanish placenames like Guadalajara and Tijuana which are pronounced with a Spanish 'hwa' in place of the hard 'j/g', even by English speakers with no Spanish language skills.
  - The below table outlines a handful of examples illustrating how the Cartesia model performs on these tricky situations, and how a competitor model (ElevenLabs) performs on the same prompt.
 
 
 | Sub-dimension                     | Example Transcript                                      | Improvement Required (Cartesia)                                                                              | Issue Consistency? | Competitor Rating | Competitor Assessment                                                                                                      | Cartesia Recording                                                                     | Competitor Recording                                                                | Comment                                                             |
 | --------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------ | ----------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Loanwords #1                      | Geneviève will visit Guadalajara en route to São Paulo. | None of the words were pronounced correctly                                                                  | Consistent         | Need to meet      | "Geneviève", "en" and "São Paulo" are pronounced poorly, but Guadalajara is spot-on for a natural American pronounciation. | [Link](supporting_files/locale_cartesia_output.mp3)                                    | [Link](supporting_files/locale_elevenlabs_output.mp3.mp3)                           | Tested using standard US voices                                     |
-| Loanwords #2                      | Nguyễn met Siobhán at the café on Rue de la Boétie.     | None of the words were pronounced correctly                                                                  | Consistent         | Need to meet      | "Nguyen" and "Siobhan" misspronounced, but French words were pronounced well (potentially \*too\* well)                    | [Link](supporting_files/cartesia_loanwords_cafe.mp3)                                   | [Link](supporting_files/elevenlabs_loanwords_cafe.mp3)                              | Tested using standard US voices                                     |
-| Locale-specific pronounciation #1 | The schedule was posted in the laboratory.              | Laboratory is not quite pronounced correctly, sounds too 'American' for a British pronounciation             | Consistent         | Need to meet      | Both are pronounced accurately for a Brit                                                                                  | [Link](supporting_files/locale_specific_pronounciation_cartesia_output_charlotte.mp3)  | [Link](supporting_files/locale_specific_pronounciation_elevenlabs_output_lily.mp3)  | Tested using UK voice (Charlotte for Cartesia, Lily for ElevenLabs) |
-| Locale-specific pronounciation #2 | The aluminium foil was in the boot of the car.          | Aluminum is pronounced halfway between American pronounciation and British pronounciation.                   | Consistent         | Need to meet      | Pronounced accurately for a Brit                                                                                           | [Link](supporting_files/locale_specific2_pronounciation_cartesia_output_charlotte.mp3) | [Link](supporting_files/locale_specific2_pronounciation_elevenlabs_output_lily.mp3) | Tested using UK voice (Charlotte for Cartesia, Lily for ElevenLabs) |
-| Locale-specific loanwords         | Flavored croissants are very niche                      | Croissants and niche are pronounced strangely for a Brittish accent (niche doesn't rhyme enough with leash). | Consistent         | Need to meet      | As a Brit, the pronounciation of both croissants and niche are spot on.                                                    | [Link](supporting_files/cartesia_locale-specific_loanwords_charlotte_uk.mp3)           | [Link](supporting_files/elevenlabs_locale-specific_loanwords_lily_uk.mp3)           | Tested using UK voice (Charlotte for Cartesia, Lily for ElevenLabs) |
+| Loanwords #1                      | Geneviève will visit Guadalajara en route to São Paulo. | None of the words were pronounced correctly                                                                  | Consistent         | Need to meet      | "Geneviève", "en" and "São Paulo" are pronounced poorly, but Guadalajara is spot-on for a natural American pronunciation. | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/locale_cartesia_output.mp3)                                    | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/locale_elevenlabs_output.mp3.mp3)                           | Tested using standard US voices                                     |
+| Loanwords #2                      | Nguyễn met Siobhán at the café on Rue de la Boétie.     | None of the words were pronounced correctly                                                                  | Consistent         | Need to meet      | "Nguyen" and "Siobhan" mispronounced, but French words were pronounced well (potentially \*too\* well)                    | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/cartesia_loanwords_cafe.mp3)                                   | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/elevenlabs_loanwords_cafe.mp3)                              | Tested using standard US voices                                     |
+| Locale-specific pronunciation #1 | The schedule was posted in the laboratory.              | Laboratory is not quite pronounced correctly, sounds too 'American' for a British pronunciation             | Consistent         | Need to meet      | Both are pronounced accurately for a Brit                                                                                  | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/locale_specific_pronunciation_cartesia_output_charlotte.mp3)  | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/locale_specific_pronunciation_elevenlabs_output_lily.mp3)  | Tested using UK voice (Charlotte for Cartesia, Lily for ElevenLabs) |
+| Locale-specific pronunciation #2 | The aluminium foil was in the boot of the car.          | Aluminum is pronounced halfway between American pronunciation and British pronunciation.                   | Consistent         | Need to meet      | Pronounced accurately for a Brit                                                                                           | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/locale_specific2_pronunciation_cartesia_output_charlotte.mp3) | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/locale_specific2_pronunciation_elevenlabs_output_lily.mp3) | Tested using UK voice (Charlotte for Cartesia, Lily for ElevenLabs) |
+| Locale-specific loanwords         | Flavored croissants are very niche                      | Croissants and niche are pronounced strangely for a British accent (niche doesn't rhyme enough with leash). | Consistent         | Need to meet      | As a Brit, the pronunciation of both croissants and niche are spot on.                                                    | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/cartesia_locale-specific_loanwords_charlotte_uk.mp3)           | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/elevenlabs_locale-specific_loanwords_lily_uk.mp3)           | Tested using UK voice (Charlotte for Cartesia, Lily for ElevenLabs) |
 
 
 
 
 
-#### Acronyms, Symbols & Numbers + Bonus comparison (Ready)
+#### Acronyms, Symbols & Numbers + Bonus comparison
  - Being able to accurately and naturally articulate Acronyms, Symbols and Numbers is a critical skill for a TTS model to have, since these situations show up in almost every single real-world use case imaginable (legal, financial, support calls, etc).
  - A failure on this task (which human readers/speakers would find trivial) won't just result in an "uncanny valley" situation, it can fundamentally cause confusion or mislead the end user, breaking all trust that might have been earned.
  - Being able to do this task accurately demonstrates that the model has a deeper understanding and contextual awareness of the information being communicated.
@@ -79,24 +65,20 @@ Chris Morrison's report for the Model Behavior Product Manager take-home.
  
 | Sub-dimension | Example Transcript                                     | Improvement Required (Cartesia)                                                                                                                                       | Issue Consistency? | Competitor Rating     | Competitor Assessment                                                  | Cartesia Recording                                     | Competitor Recording                                     | Comment                         |
 | ------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------ | --------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------ | -------------------------------------------------------- | ------------------------------- |
-| Filenames     | The file is saved as config.yaml in the etc directory. | Voice trails off and sounds hessitant, strange pronounciation of "[…]aml" and "etc"                                                                                   | Consistent         | Cartesia > Competitor | Performs worse on both filename and etc pronounciation                 | [Link](supporting_files/filenames_cartesia_output.mp3) | [Link](supporting_files/filenames_elevenlabs_output.mp3) | Tested using standard US voices |
-| Acronyms      | He got a Ph.D. from MIT and now works at OpenAI, Inc.  | Mostly correct except that PHD is pronounced P-H-dot-D.                                                                                                               | Consistent         | Cartesia < Competitor | Performs better, natururally sounding out the PHD without punctuation. | [Link](supporting_files/phd_cartesia_output.mp3)       | [Link](supporting_files/phd_elevenlabs_output.mp3)       | Tested using standard US voices |
-| Numbers      | Call me at 03/04/05 at 06:07.                          | Doesn't correctly identify the date format so says "April fifth" instead of "Fourth of March 2005" or "Third of April 2005" (either are correct depending on context) | Consistent         | Cartesia > Competitor | Performs poorly, simply reads out the numbers.                         | [Link](supporting_files/date_cartesia_output.mp3)      | [Link](supporting_files/date_elevenlabs_output.mp3)      | Tested using standard US voices |
-
-
-
+| Filenames     | The file is saved as config.yaml in the etc directory. | Voice trails off and sounds hesitant, strange pronunciation of "[…]aml" and "etc"                                                                                   | Consistent         | Cartesia > Competitor | Performs worse on both filename and etc pronunciation                 | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/filenames_cartesia_output.mp3) | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/filenames_elevenlabs_output.mp3) | Tested using standard US voices |
+| Acronyms      | He got a Ph.D. from MIT and now works at OpenAI, Inc.  | Mostly correct except that PHD is pronounced P-H-dot-D.                                                                                                               | Consistent         | Cartesia < Competitor | Performs better, naturally sounding out the PHD without punctuation. | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/phd_cartesia_output.mp3)       | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/phd_elevenlabs_output.mp3)       | Tested using standard US voices |
+| Numbers      | Call me at 03/04/05 at 06:07.                          | Doesn't correctly identify the date format so says "April fifth" instead of "Fourth of March 2005" or "Third of April 2005" (either are correct depending on context) | Consistent         | Cartesia > Competitor | Performs poorly, simply reads out the numbers.                         | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/date_cartesia_output.mp3)      | [Link](https://github.com/chrism202/cartesia-exploration-and-assessment/blob/main/supporting_files/date_elevenlabs_output.mp3)      | Tested using standard US voices |
 
 
 
 
 ## Step 3 - Pick one of the aspects to dive deeper on
 
-Choice: Pronounciation (Locale-specific and code-switching)
+Choice: Pronunciation (Locale-specific and code-switching)
 
 ### Why did you choose that one?
 
- - This is important because 20% of households speak another language
- - They will immediately pick up if the word is pronounced incorrectly
+This is important because 20% of US households speak at least one other language at home regularly (per US Census Bureau). But it's not just those who speak another language. The vast majority of native speakers will notice if a word is not pronounced how they have heard it pronounced all their lives.
 
 
 ### How would you operationalize data collection & evaluations?
@@ -129,17 +111,6 @@ Choice: Pronounciation (Locale-specific and code-switching)
 
 ## Step 4 - A gift from the modeling team
 
-A Gift from Modeling Team
-The model team found a way to give the model a “context”. A context is a 512-bit vector that is passed into the API calls. It encodes the entire context for the model to nail current TTS generation, and outputs a new context that includes the context and everything that has been generated. Alternatively, the model can receive context and any text and just “add to context”, without generating speech from this.
-
-For example:
-addToContext(C,“The next sentence should be said very loudly, as if you are very angry”)
-C = generate(C,“This is unacceptable!”)
-
-You can think about the context as representing roughly a voice actor’s state-of-mind when speaking out their part in a conversation, or doing a longer narration. It doesn’t guide the model on *what to say*, but *how* to say it.
-
-
-
 ### Step 4.1. What are 2-3 usages of this context feature that you could see? What is the first one you would try?
 
  - This functionality effectively enables a deeper level of customization for the model output, but without having to re-train the model (which takes time and GPUs).
@@ -152,10 +123,6 @@ You can think about the context as representing roughly a voice actor’s state-
  - This capability has applications wherever audio and video require localization (YouTube, Podcasts, Instagram/Tik Tok, etc).
  - This would involve extracting the context vector representation of the original voice vocal arc throughout the duration of the recording, and re-inserting it during the generation of the localized dub.
  - This is extremely useful, and would result in a higher quality automatically generated dub, where the outputted audio mirrors the original in tone, emotional shape, phrasing changes, etc.
-
-
-
-
 
 
 #### Priority 2: Listener-personalized context blending / Explicit voice preference
@@ -177,6 +144,35 @@ You can think about the context as representing roughly a voice actor’s state-
 ### Step 4.2. Write the launch blog post for this feature.
 
 
+**Introducing Performance-Preserved Dubbing with Cartesia Context**
+
+We’re launching a new Cartesia capability that keeps the acting choices of an original performance intact—while you dub it into another language. By capturing the emotional arc, loud/soft moments, and pacing of the source actor, Cartesia can carry that intent into the target language so the dubbed line feels true to the original scene.
+
+**Why it matters**  
+Most dubbing today matches words and timing, but loses performance. The result can feel flat or off-brand, even when the translation is accurate. Performance-preserved dubbing bridges that gap: a Spanish adaptation keeps the urgency of the English lead; a TikTok voiceover holds the playful rise-and-fall of the creator; a localized game cutscene preserves tension without re-directing every line.
+
+**What you can do**  
+- Film/TV localization: Maintain the original emotional shape—where the actor presses, pauses, or softens—while delivering fluent target-language lines.  
+- YouTube and shorts: Keep creator energy consistent across languages so punchlines and call-to-actions land with the same arc.  
+- Games and ads: Protect character and brand voice at scale; no need to re-specify style on every line.
+
+**How it works**  
+- Extract performance cues: Use script-level analysis (LLM or metadata) plus acoustic signals to build a representation of the source actor’s emotional beats and intensity changes.  
+- Carry context forward: `addToContext` stores those beats (e.g., “rising tension, mid-sentence softening, final line relief”) for the target-language session.  
+- Generate with fidelity: As Cartesia synthesizes each translated line, it references the stored context to mirror loud/soft transitions, tempo shifts, and overall emotional contour—even when phrasing changes.
+
+**Example workflow**  
+1) Analyze the original scene: capture where the actor leans in, pulls back, and peaks.  
+2) Translate the script.  
+3) Call `addToContext` with the extracted performance vector.  
+4) Generate dubbed lines; Cartesia matches the performance arc while speaking the new language.  
+5) Optional: refresh context between scenes to reflect new emotional turns.
+
+**Why this is novel**  
+Traditional dubbing tools sync timing; Cartesia’s context keeps performance. You’re not just aligning syllables—you’re carrying intent, so the dubbed version feels directed, not simply translated.
+
+**Available now**  
+Performance-preserved dubbing is live via the Cartesia API. Explore the sample scripts, drop in your scenes, and share how it elevates your next localization.
 
 
 
